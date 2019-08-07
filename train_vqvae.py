@@ -107,7 +107,7 @@ if __name__ == '__main__':
         )
 
     for i in range(args.epoch):
-        train(i, loader, model, optimizer, scheduler, device, save_path)
+        train(i, loader, model, optimizer, scheduler, device, args.save_path)
         torch.save(
-            model.module.state_dict(), f'{save_path}/checkpoint/vqvae_{str(i + 1).zfill(3)}.pt'
+            model.module.state_dict(), f'{args.save_path}/checkpoint/vqvae_{str(i + 1).zfill(3)}.pt'
         )

@@ -101,7 +101,7 @@ if __name__ == '__main__':
     model = nn.DataParallel(VQVAE()).to(device)
 
     if args.start > 0:
-        model.load_state_dict(torch.load(f'{args.save_path}/checkpoint/vqvae_{str(args.start).zfill(3)}.pt'))
+        model.module.load_state_dict(torch.load(f'{args.save_path}/checkpoint/vqvae_{str(args.start).zfill(3)}.pt'))
 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = None

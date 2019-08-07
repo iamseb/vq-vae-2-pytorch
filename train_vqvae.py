@@ -78,6 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('--sched', type=str)
     parser.add_argument('path', type=str)
     parser.add_argument('--save_path', type=str, default=".")
+    parser.add_argument('--start', type=int, default=0)
 
     args = parser.parse_args()
 
@@ -98,6 +99,9 @@ if __name__ == '__main__':
     loader = DataLoader(dataset, batch_size=128, shuffle=True, num_workers=4)
 
     model = nn.DataParallel(VQVAE()).to(device)
+
+    if args.start > 0:
+        model.load_state_dict(torch.load(f'{args.save_path}/checkpoint/vqvae_{str(start).zfill(3)}.pt'))
 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = None

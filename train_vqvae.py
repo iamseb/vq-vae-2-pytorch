@@ -77,7 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=3e-4)
     parser.add_argument('--sched', type=str)
     parser.add_argument('path', type=str)
-    parser.add_argument('--save_path, type=str, default=".")
+    parser.add_argument('--save_path', type=str, default=".")
 
     args = parser.parse_args()
 

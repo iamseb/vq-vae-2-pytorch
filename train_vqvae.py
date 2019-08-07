@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 
 from torchvision import datasets, transforms, utils
 
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 from vqvae import VQVAE
 from scheduler import CycleScheduler

@@ -110,7 +110,7 @@ if __name__ == '__main__':
             optimizer, args.lr, n_iter=len(loader) * args.epoch, momentum=None
         )
 
-    for i in range(args.start + args.epoch):
+    for i in range(args.start, args.epoch):
         train(i, loader, model, optimizer, scheduler, device, args.save_path)
         torch.save(
             model.module.state_dict(), f'{args.save_path}/checkpoint/vqvae_{str(i + 1).zfill(3)}.pt'

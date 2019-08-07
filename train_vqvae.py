@@ -12,7 +12,7 @@ from vqvae import VQVAE
 from scheduler import CycleScheduler
 
 
-def train(epoch, loader, model, optimizer, scheduler, device):
+def train(epoch, loader, model, optimizer, scheduler, device, save_path=''):
     loader = tqdm(loader)
 
     criterion = nn.MSELoss()
@@ -61,7 +61,7 @@ def train(epoch, loader, model, optimizer, scheduler, device):
 
             utils.save_image(
                 torch.cat([sample, out], 0),
-                f'sample/{str(epoch + 1).zfill(5)}_{str(i).zfill(5)}.png',
+                f'{save_path}/sample/{str(epoch + 1).zfill(5)}_{str(i).zfill(5)}.png',
                 nrow=sample_size,
                 normalize=True,
                 range=(-1, 1),
@@ -77,6 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=3e-4)
     parser.add_argument('--sched', type=str)
     parser.add_argument('path', type=str)
+    parser.add_argument('--save_path, type=str, default=".")
 
     args = parser.parse_args()
 
@@ -106,7 +107,7 @@ if __name__ == '__main__':
         )
 
     for i in range(args.epoch):
-        train(i, loader, model, optimizer, scheduler, device)
+        train(i, loader, model, optimizer, scheduler, device, save_path)
         torch.save(
-            model.module.state_dict(), f'checkpoint/vqvae_{str(i + 1).zfill(3)}.pt'
+            model.module.state_dict(), f'{save_path}/checkpoint/vqvae_{str(i + 1).zfill(3)}.pt'
         )

@@ -79,6 +79,7 @@ if __name__ == '__main__':
     parser.add_argument('path', type=str)
     parser.add_argument('--save_path', type=str, default=".")
     parser.add_argument('--start', type=int, default=0)
+    parser.add_argument('--resume', action='store_true', default=False)    
 
     args = parser.parse_args()
 
@@ -100,8 +101,19 @@ if __name__ == '__main__':
 
     model = nn.DataParallel(VQVAE()).to(device)
 
-    if args.start > 0:
-        model.module.load_state_dict(torch.load(f'{args.save_path}/checkpoint/vqvae_{str(args.start).zfill(3)}.pt'))
+    if args.resume:
+        checkpoints = glob.glob(f'{args.save_path}/checkpoint/vqvae_*.pt')
+        checkpoints.sort(key=os.path.getmtime, reverse=True)
+        checkpoint = checkpoints[0]
+        print(f'Resuming from {checkpoint}')
+        model.module.load_state_dict(torch.load(checkpoint))
+    elif args.start > 0:
+        checkpoint = f'{args.save_path}/checkpoint/vqvae_{str(args.start).zfill(3)}.pt'
+        print(f'Resuming from {checkpoint}')
+        model.module.load_state_dict(torch.load(checkpoint))
+    else:
+        print(f'Restarting training from beginning...')
+
 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = None

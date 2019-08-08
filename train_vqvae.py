@@ -1,5 +1,10 @@
 import argparse
 
+import os
+import glob
+
+from IPython.display import clear_output
+
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
@@ -127,3 +132,4 @@ if __name__ == '__main__':
         torch.save(
             model.module.state_dict(), f'{args.save_path}/checkpoint/vqvae_{str(i + 1).zfill(3)}.pt'
         )
+        clear_output()

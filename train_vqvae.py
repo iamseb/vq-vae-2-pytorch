@@ -17,7 +17,7 @@ from vqvae import VQVAE
 from scheduler import CycleScheduler
 
 
-def train(epoch, loader, model, optimizer, scheduler, device, save_path=''):
+def train(epoch, loader, model, optimizer, scheduler, device, save_path=""):
     loader = tqdm(loader)
 
     criterion = nn.MSELoss()
@@ -46,13 +46,13 @@ def train(epoch, loader, model, optimizer, scheduler, device, save_path=''):
         mse_sum += recon_loss.item() * img.shape[0]
         mse_n += img.shape[0]
 
-        lr = optimizer.param_groups[0]['lr']
+        lr = optimizer.param_groups[0]["lr"]
 
         loader.set_description(
             (
-                f'epoch: {epoch + 1}; mse: {recon_loss.item():.5f}; '
-                f'latent: {latent_loss.item():.3f}; avg mse: {mse_sum / mse_n:.5f}; '
-                f'lr: {lr:.5f}'
+                f"epoch: {epoch + 1}; mse: {recon_loss.item():.5f}; "
+                f"latent: {latent_loss.item():.3f}; avg mse: {mse_sum / mse_n:.5f}; "
+                f"lr: {lr:.5f}"
             )
         )
 
@@ -66,7 +66,7 @@ def train(epoch, loader, model, optimizer, scheduler, device, save_path=''):
 
             utils.save_image(
                 torch.cat([sample, out], 0),
-                f'{save_path}/sample/{str(epoch + 1).zfill(5)}_{str(i).zfill(5)}.png',
+                f"{save_path}/sample/{str(epoch + 1).zfill(5)}_{str(i).zfill(5)}.png",
                 nrow=sample_size,
                 normalize=True,
                 range=(-1, 1),
@@ -75,22 +75,22 @@ def train(epoch, loader, model, optimizer, scheduler, device, save_path=''):
             model.train()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--size', type=int, default=256)
-    parser.add_argument('--epoch', type=int, default=560)
-    parser.add_argument('--lr', type=float, default=3e-4)
-    parser.add_argument('--sched', type=str)
-    parser.add_argument('path', type=str)
-    parser.add_argument('--save_path', type=str, default=".")
-    parser.add_argument('--start', type=int, default=0)
-    parser.add_argument('--resume', action='store_true', default=False)    
+    parser.add_argument("--size", type=int, default=256)
+    parser.add_argument("--epoch", type=int, default=560)
+    parser.add_argument("--lr", type=float, default=3e-4)
+    parser.add_argument("--sched", type=str)
+    parser.add_argument("path", type=str)
+    parser.add_argument("--save_path", type=str, default=".")
+    parser.add_argument("--start", type=int, default=0)
+    parser.add_argument("--resume", action="store_true", default=False)
 
     args = parser.parse_args()
 
     print(args)
 
-    device = 'cuda'
+    device = "cuda"
 
     transform = transforms.Compose(
         [
@@ -107,22 +107,20 @@ if __name__ == '__main__':
     model = nn.DataParallel(VQVAE()).to(device)
 
     if args.resume:
-        checkpoints = glob.glob(f'{args.save_path}/checkpoint/vqvae_*.pt')
+        checkpoints = glob.glob(f"{args.save_path}/checkpoint/vqvae_*.pt")
         checkpoints.sort(key=os.path.getmtime, reverse=True)
-        checkpoint = checkpoints[0]
-        print(f'Resuming from {checkpoint}')
-        model.module.load_state_dict(torch.load(checkpoint))
-    elif args.start > 0:
-        checkpoint = f'{args.save_path}/checkpoint/vqvae_{str(args.start).zfill(3)}.pt'
-        print(f'Resuming from {checkpoint}')
+        args.start = int(checkpoints[0][-6:-3])
+    
+    if args.start > 0:
+        checkpoint = f"{args.save_path}/checkpoint/vqvae_{str(args.start).zfill(3)}.pt"
+        print(f"Resuming from {checkpoint}")
         model.module.load_state_dict(torch.load(checkpoint))
     else:
-        print(f'Restarting training from beginning...')
-
+        print(f"Restarting training from beginning...")
 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = None
-    if args.sched == 'cycle':
+    if args.sched == "cycle":
         scheduler = CycleScheduler(
             optimizer, args.lr, n_iter=len(loader) * args.epoch, momentum=None
         )
@@ -130,6 +128,7 @@ if __name__ == '__main__':
     for i in range(args.start, args.epoch):
         train(i, loader, model, optimizer, scheduler, device, args.save_path)
         torch.save(
-            model.module.state_dict(), f'{args.save_path}/checkpoint/vqvae_{str(i + 1).zfill(3)}.pt'
+            model.module.state_dict(),
+            f"{args.save_path}/checkpoint/vqvae_{str(i + 1).zfill(3)}.pt",
         )
         clear_output()
